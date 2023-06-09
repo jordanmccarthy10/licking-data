@@ -4,4 +4,5 @@ ffprobe -v error -select_streams v:0 -show_entries stream=r_frame_rate -of defau
 ## change brightness of a video (without extracting frames)  
 ffmpeg -i path/to/video.mp4 -vf "eq=brightness=0.4:contrast=1.6" output.mp4  
 *may have to /Applications/ffmpeg*
- 
+## slow down a video so it's two times slower (without extracting frames)  
+ffmpeg -i input.mp4 -vf "setpts=2.0*PTS" output.mp4
