@@ -59,3 +59,28 @@ for trial = 1:length(startFrame)
     drinkingPeriods{trial} = [startFrame(trial):startFrame(trial)+1750];
 end
 
+%% create cell arrays for the sampling periods
+%find start of sampling period (auditory cue is ttl_times3)
+
+startSample = zeros(length(ttl_times{3}),1);
+
+for j=1:length(ttl_times{3})
+    [~,index] = min(abs(ttl_times{1}-ttl_times{3}(j)));
+    startSample(j) = index;
+end
+
+%create cell array of sampling periods. since sampling periods vary in time
+%and may or may not end with a drinking period, this checks if there is a
+%drinking period within 10s and if not makes the sampling period 10s
+%(10*350fps)
+
+samplingPeriods = cell(length(startSample),1);
+
+for period = 1:length(samplingPeriods)
+    matches = find(startFrame>startSample(period)&startFrame<startSample(period)+3500);
+    if isempty(matches)
+        samplingPeriods{period}=startSample(period):startSample(period)+3500;
+    else 
+        samplingPeriods{period}=startSample(period):startFrame(matches);
+    end
+end 
