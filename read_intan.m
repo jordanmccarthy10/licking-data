@@ -17,8 +17,8 @@ low-to-high transitions as our TTL "times"
 
 clear all
 
-filename = '/Users/jordanmccarthy/Desktop/licking/ILPG_Silencing_Di_#4/20230622/digitalin.dat';
-save_file_name = '/Users/jordanmccarthy/Desktop/ttl_timesDi#4.mat';
+filename = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#23/20230627/digitalin.dat';
+save_file_name = '/Users/jordanmccarthy/Desktop/Phox2B_#23_2023_0627_ttl_times.mat';
 
 file = fopen(filename,'r');
 digital_inputs_raw = fread(file,'uint16');
@@ -59,7 +59,7 @@ for trial = 1:length(startFrame)
     drinkingPeriods{trial} = [startFrame(trial):startFrame(trial)+1750];
 end
 
-%% create cell arrays for the sampling periods
+%% create cell arrays for the sampling periods (have to run drinking periods first)
 %find start of sampling period (auditory cue is ttl_times3)
 
 startSample = zeros(length(ttl_times{3}),1);
@@ -84,3 +84,51 @@ for period = 1:length(samplingPeriods)
         samplingPeriods{period}=startSample(period):startFrame(matches);
     end
 end 
+
+
+%% info to make raster plot
+
+LickTimes = cell(length(ttl_times{3}),1);
+
+% organize licks into trials
+
+for k=1:length(ttl_times{3})
+    for f=1:length(ttl_times{2})
+        %finds the last trial's licks
+     if k==length(ttl_times{3})
+        if ttl_times{2}(f)>= ttl_times{3}(k)
+             LickTimes{k}=[LickTimes{k},ttl_times{2}(f)];
+        end
+     else
+         %finds licks in every other trial
+              if ttl_times{2}(f) >= ttl_times{3}(k) && ttl_times{2}(f)<ttl_times{3}(k+1)
+                 LickTimes{k}=[LickTimes{k},ttl_times{2}(f)];
+              end
+     end
+    end
+     LickTimes{k}=LickTimes{k}-ttl_times{3}(k); %set cue to 0
+     LickTimes{k}=LickTimes{k}/30000; %divide by intan frame rate for time in seconds
+end
+
+% trial structure intan frames 
+
+Cues = ttl_times{3}/30000; %puts cues into seconds
+Water = ttl_times{4}/30000; %puts water delivery into seconds
+
+%find water delivery time for each trial
+for w=1:length(Water)
+    for c=1:length(Cues)
+        if Water(w)-Cues(c)<10 && Water(w)-Cues(c)>0 %10s is the sampling period
+            Water(w)=Water(w)-Cues(c);
+        end
+    end
+end
+
+%set cues to zero
+Cues=zeros(length(ttl_times{3}),1);
+
+
+% define save file name
+name = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#23/20230627/rasterplotinfo';
+
+save(name, 'LickTimes', 'Water', 'Cues')
