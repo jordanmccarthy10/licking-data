@@ -17,8 +17,8 @@ low-to-high transitions as our TTL "times"
 
 clear all
 
-filename = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#23/20230627/digitalin.dat';
-save_file_name = '/Users/jordanmccarthy/Desktop/Phox2B_#23_2023_0627_ttl_times.mat';
+filename = '/Users/jordanmccarthy/Desktop/licking/opto/Phox2B_#20_opto_burst_0.11mV_230630_161406/digitalin.dat';
+save_file_name = '/Users/jordanmccarthy/Desktop/licking/opto/Phox2B_#20_opto_burst_0.11mV_2023_0630_ttl_times.mat';
 
 file = fopen(filename,'r');
 digital_inputs_raw = fread(file,'uint16');
@@ -59,6 +59,10 @@ for trial = 1:length(startFrame)
     drinkingPeriods{trial} = [startFrame(trial):startFrame(trial)+1750];
 end
 
+% define save file names
+nameDrink = '/Users/jordanmccarthy/Desktop/licking/drinkingperiods';
+save(nameDrink, 'drinkingPeriods')
+
 %% create cell arrays for the sampling periods (have to run drinking periods first)
 %find start of sampling period (auditory cue is ttl_times3)
 
@@ -85,6 +89,9 @@ for period = 1:length(samplingPeriods)
     end
 end 
 
+% define save file names
+nameSample = '/Users/jordanmccarthy/Desktop/licking/samplingperiods';
+save(nameSample, 'samplingPeriods')
 
 %% info to make raster plot
 
@@ -132,3 +139,17 @@ Cues=zeros(length(ttl_times{3}),1);
 name = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#23/20230627/rasterplotinfo';
 
 save(name, 'LickTimes', 'Water', 'Cues')
+
+%% get laser stim frame for optogenetics
+
+LaserStim = zeros(length(ttl_times{5}),1);
+
+for p= 1:length(ttl_times{5})
+    [~,index] = min(abs(ttl_times{1}-ttl_times{5}(p)));
+    LaserStim(p) = index;
+end
+
+%define save file name
+nameOpto = '/Users/jordanmccarthy/Desktop/licking/opto/Phox2B_#20_opto_burst_0.11mW_2023_0630_laserpulses';
+
+save(nameOpto, 'LaserStim')
