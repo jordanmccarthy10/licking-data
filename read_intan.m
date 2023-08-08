@@ -17,8 +17,9 @@ low-to-high transitions as our TTL "times"
 
 clear all
 
-filename = '/Users/jordanmccarthy/Desktop/licking/opto/Phox2B_#20_opto_burst_0.11mV_230630_161406/digitalin.dat';
-save_file_name = '/Users/jordanmccarthy/Desktop/licking/opto/Phox2B_#20_opto_burst_0.11mV_2023_0630_ttl_times.mat';
+%don't forget to change the one at the bottom too!
+filename = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#27/20230731/Phox2B_#27_230731_114818/digitalin.dat'; %tell it which digitalin.dat file to use
+save_file_name = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#27/20230731/ttl_times.mat';
 
 file = fopen(filename,'r');
 digital_inputs_raw = fread(file,'uint16');
@@ -59,9 +60,10 @@ for trial = 1:length(startFrame)
     drinkingPeriods{trial} = [startFrame(trial):startFrame(trial)+1750];
 end
 
-% define save file names
-nameDrink = '/Users/jordanmccarthy/Desktop/licking/drinkingperiods';
-save(nameDrink, 'drinkingPeriods')
+% % define save file names only if you want to analyze this period
+% specifically
+% nameDrink = '/Users/jordanmccarthy/Desktop/licking/Phox2b_#22/20230718/drinkingperiods';
+% save(nameDrink, 'drinkingPeriods')
 
 %% create cell arrays for the sampling periods (have to run drinking periods first)
 %find start of sampling period (auditory cue is ttl_times3)
@@ -89,11 +91,38 @@ for period = 1:length(samplingPeriods)
     end
 end 
 
-% define save file names
-nameSample = '/Users/jordanmccarthy/Desktop/licking/samplingperiods';
-save(nameSample, 'samplingPeriods')
+% % define save file names only if you want to analyze this period
+% specifically
+% nameSample = '/Users/jordanmccarthy/Desktop/licking/Phox2b_#22/20230718/samplingperiods';
+% save(nameSample, 'samplingPeriods')
 
-%% info to make raster plot
+%% create an array of sampling+drinking period frames - run the others first
+
+SampleDrinkPeriods = cell(length(samplingPeriods),1);
+
+for period = 1:length(samplingPeriods)
+    lastFrameSample = samplingPeriods{period}(end);
+
+    matchFound = false;
+
+    for success = 1:length(drinkingPeriods)
+        if drinkingPeriods{success}(1) == lastFrameSample
+            SampleDrinkPeriods{period} = [samplingPeriods{period}, drinkingPeriods{success}(2:end)];
+            matchFound = true;
+            break;
+        end
+    end
+    if ~matchFound
+        SampleDrinkPeriods{period}=samplingPeriods{period};
+    end
+end
+
+%tell it how to save this variable!!!! move this into
+%SampleAndDrinkNumberofLicksPerBout
+nameCombined = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#27/20230731/0731combinedsampledrink';
+save(nameCombined, 'SampleDrinkPeriods')
+
+%% info to make raster plot - save name at the bottom!
 
 LickTimes = cell(length(ttl_times{3}),1);
 
@@ -115,6 +144,9 @@ for k=1:length(ttl_times{3})
     end
      LickTimes{k}=LickTimes{k}-ttl_times{3}(k); %set cue to 0
      LickTimes{k}=LickTimes{k}/30000; %divide by intan frame rate for time in seconds
+     if isempty(LickTimes{k})
+         LickTimes{k}=nan(1,3);
+     end
 end
 
 % trial structure intan frames 
@@ -136,11 +168,11 @@ Cues=zeros(length(ttl_times{3}),1);
 
 
 % define save file name
-name = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#23/20230627/rasterplotinfo';
+name = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#27/20230731/rasterplotinfo';
 
 save(name, 'LickTimes', 'Water', 'Cues')
 
-%% get laser stim frame for optogenetics
+%% get laser stim frame for optogenetics - change save name!
 
 LaserStim = zeros(length(ttl_times{5}),1);
 
@@ -150,6 +182,6 @@ for p= 1:length(ttl_times{5})
 end
 
 %define save file name
-nameOpto = '/Users/jordanmccarthy/Desktop/licking/opto/Phox2B_#20_opto_burst_0.11mW_2023_0630_laserpulses';
+nameOpto = '/Users/jordanmccarthy/Desktop/licking/opto/Phox2B#21/burst_laserpulses';
 
 save(nameOpto, 'LaserStim')
