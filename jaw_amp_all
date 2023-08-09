@@ -1,0 +1,26 @@
+import seaborn as sns
+from scipy.io import loadmat
+import matplotlib.pyplot as plt
+
+#this code plots jaw amplitude values as a sawrmplot. it needs the jaw_amplitudes variable from jaw_analysis.m. 
+# If you have a lot of peaks (you probably do) it will take a long time to plot.
+
+
+#change this save name!!!
+save_file_name = "/Users/jordanmccarthy/Desktop/JawAmplitudesALL" #specify this every time
+
+# extract the peaks data from the MATLAB files
+mat_control = loadmat('/Users/jordanmccarthy/Desktop/jaw_amplitudes_control.mat', squeeze_me=True) #these have to be files containing one variable with one array that is either a row or a column
+mat_silenced = loadmat('/Users/jordanmccarthy/Desktop/jaw_amplitudes_silenced.mat', squeeze_me=True) 
+
+control=mat_control['jaw_amplitudes_control'] #make sure this matches the variable name in the mat_control file
+silenced = mat_silenced['jaw_amplitudes_silenced'] #make sure this matches the variable name in the mat_silenced file
+
+plt.figure(figsize=(10,4))
+
+sns.swarmplot(x=['Before Silencing']*len(control), y=control, color='blue', size=0.8)
+sns.swarmplot(x=['After Silencing']*len(silenced), y=silenced, color='orange', size=0.8)
+
+plt.ylabel('Jaw Amplitude (AU)')
+
+plt.savefig(save_file_name+".pdf",dpi=1300)
