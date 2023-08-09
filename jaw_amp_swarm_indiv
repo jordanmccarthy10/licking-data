@@ -1,0 +1,43 @@
+import seaborn as sns
+from scipy.io import loadmat
+import matplotlib.pyplot as plt
+
+#this will make swarmplots using the jaw_amplitudes variable from jaw_analysis.m - this one was used to plot individual mice before and after silencing on the same graph
+#this makes the swarmplots kind of far apart, which was fixed in illustrator, but plt.tight_layout might work (it's been added, not tested)
+
+
+save_file_name = "/Users/jordanmccarthy/Desktop/JawAmplitudes" #specify this every time
+
+# extract the peaks data from the MATLAB files
+mat_control22 = loadmat('/Users/jordanmccarthy/Desktop/jawamplitudes#22control0627', squeeze_me=True)
+mat_control23 = loadmat('/Users/jordanmccarthy/Desktop/jawamplitudes#23control0627', squeeze_me=True) 
+mat_control24 = loadmat('/Users/jordanmccarthy/Desktop/jawamplitudes#24control0710', squeeze_me=True)  
+mat_silenced22 = loadmat('/Users/jordanmccarthy/Desktop/jawamplitudes#22silencing0718', squeeze_me=True) 
+mat_silenced23 = loadmat('/Users/jordanmccarthy/Desktop/jawamplitudes#23silencing0719', squeeze_me=True) 
+mat_silenced24 = loadmat('/Users/jordanmccarthy/Desktop/jawamplitudes#24silencing0719', squeeze_me=True) 
+
+control22 = mat_control22['jaw_amplitudes']
+control23 = mat_control23['jaw_amplitudes']
+control24 = mat_control24['jaw_amplitudes']
+silenced22 = mat_silenced22['jaw_amplitudes']
+silenced23 = mat_silenced23['jaw_amplitudes']
+silenced24 = mat_silenced24['jaw_amplitudes']
+
+
+plt.figure(figsize=(13,7))
+plt.tight_layout
+
+#create swarmplot
+sns.swarmplot(x=['Before #22']*len(control22), y=control22, color='blue', size=0.8)
+sns.swarmplot(x=['After #22']*len(silenced22), y=silenced22, color='orange', size=0.8)
+sns.swarmplot(x=['Before #23']*len(control23), y=control23, color='blue', size=0.8)
+sns.swarmplot(x=['After #23']*len(silenced23), y=silenced23, color='orange', size=0.8)
+sns.swarmplot(x=['Before #24']*len(control24), y=control24, color='blue', size=0.8)
+sns.swarmplot(x=['After #24']*len(silenced24), y=silenced24, color='orange', size=0.8)
+
+
+plt.ylabel('Jaw Amplitude (AU)')
+#plt.title('Licking Amplitude')
+#plt.show()
+#save the plot as a PDF
+plt.savefig(save_file_name+".pdf",dpi=1000)
