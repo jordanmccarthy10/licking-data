@@ -18,8 +18,8 @@ low-to-high transitions as our TTL "times"
 clear all
 
 %don't forget to change the one at the bottom too!
-filename = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#27/20230731/Phox2B_#27_230731_114818/digitalin.dat'; %tell it which digitalin.dat file to use
-save_file_name = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#27/20230731/ttl_times.mat';
+filename = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#25/07192023/Phox2B_#25_230719_153351/digitalin.dat'; %tell it which digitalin.dat file to use
+save_file_name = '/Users/jordanmccarthy/Desktop/Phox2b#250719ttl_times.mat';
 
 file = fopen(filename,'r');
 digital_inputs_raw = fread(file,'uint16');
@@ -119,7 +119,7 @@ end
 
 %tell it how to save this variable!!!! move this into
 %SampleAndDrinkNumberofLicksPerBout
-nameCombined = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#27/20230731/0731combinedsampledrink';
+nameCombined = '/Users/jordanmccarthy/Desktop/Phox2b#250719combinedsampledrink';
 save(nameCombined, 'SampleDrinkPeriods')
 
 %% info to make raster plot - save name at the bottom!
@@ -166,11 +166,19 @@ end
 %set cues to zero
 Cues=zeros(length(ttl_times{3}),1);
 
+% find trials where water was dispensed
+WaterDispense = [];
+
+for t=1:numel(SampleDrinkPeriods)
+    if length(SampleDrinkPeriods{t}) ~= 3501
+        WaterDispense = [WaterDispense,t];
+    end
+end
 
 % define save file name
-name = '/Users/jordanmccarthy/Desktop/licking/Phox2B_#27/20230731/rasterplotinfo';
+name = '/Users/jordanmccarthy/Desktop/Phox2b#250719rasterplotinfo';
 
-save(name, 'LickTimes', 'Water', 'Cues')
+save(name, 'LickTimes', 'Water', 'Cues','WaterDispense')
 
 %% get laser stim frame for optogenetics - change save name!
 
